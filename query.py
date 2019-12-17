@@ -20,11 +20,15 @@ class Database_connector:
     def query(self, query):
         self.df =  pd.read_sql(query, con=self.mariadb_connection)
         return self.df
-    
+
+    def columns_subset(self, *args):
+        return self.df[args]
+
+
     def pivot(self, index, columns, values):
         self.pivot_df = self.df.pivot(index= index, columns=columns, values=values)
         return self.pivot_df
-    
+
     def save_df(self, dataframe, direc='./', name= 'df.pkl'):
         try:
             getattr(self, dataframe).to_pickle(direc+name)
