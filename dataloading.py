@@ -17,6 +17,47 @@ class Dataset(data.Dataset):
     def __getitem__(self, index):
         return [index]
 
+def data_split(data, test_size = 0.25):
+    #triplets=[]
+    #user_track={}
+    #item_track={}
+    #for row in range(data.shape[0]):
+    #    row_counter = 0
+    #    for column in range(data.shape[1]):
+    #        if not data[row, column]:
+    #            continue
+
+    #        if column in item_track.keys:
+    #            item_track[column]+=1
+
+    #        else:
+    #            item_track[column]=1
+
+    #        row_counter += 1
+    #        triplets.append((row, column, data[row, column]))
+    #    user_track[row] = row_counter
+    binTable = np.isnan(data)
+    user_count = np.sum(binTable, axis = 1)
+    item_count = np.sum(binTable, axis = 0)
+    total_count = user_count + item_count
+    item_idx = np.where(item_count > 1)
+    user_idx = np.where(user_count > 1)
+
+    user_unique = [x for x in range(data.shape[0]) if x not in  user_idx]
+    item_unique = [x for x in range(data.shape[1]) if x not in  item_idx]
+
+    dupl_entry = [(row,column,table[row,column]) for column in item_idx for row in user_idx]
+    train_subset_0 , test_set = train_test_split(dupl_entry, test_size=
+                                               test_size)`
+    train_subset_1 = [(row, column,table[row,column]) for column in item_unique
+                      for row in user_unique]
+    train_set = np.stack(train_subset_0, train_subset_1, axis = 0)
+
+    return train_set, test_set
+
+
+
+
 def data_loading():
     params = {'batch_size':64,
                 'shuffle':True,
@@ -33,7 +74,7 @@ def data_loading():
 
     table_data = table_subset.values
 
-    train_data, test_data = train_test_split(table_data, test_size=0.25)
+    train_data, test_data = data_split(table_data, test_size=0.25)
 
     train_data = pd.DataFrame(train_data)
     test_data = pd.DataFrame(test_data)
