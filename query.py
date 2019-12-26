@@ -17,8 +17,12 @@ class Database_connector:
         self.mariadb_connection = mariadb.connect(host='localhost', user= 'root', password='fadwa123', database='rs_101')
         self.df = None
 
-    def query(self, query):
-        self.df =  pd.read_sql(query, con=self.mariadb_connection)
+    def query(self, query=None):
+        if query:
+            self.df =  pd.read_sql(query, con=self.mariadb_connection)
+            return self.df
+        self.df = pd.read_pickle('./df.pkl')
+
         return self.df
 
     def columns_subset(self, *args):
