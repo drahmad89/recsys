@@ -16,7 +16,8 @@ class Dataset(data.Dataset):
         return len(self.table)
 
     def __getitem__(self, index):
-        return [index]
+        return torch.from_numpy(self.table[index]).type(torch.DoubleTensor).cuda()
+
 
 def data_split(data, test_size = 0.25):
     #triplets=[]
@@ -48,11 +49,10 @@ def data_split(data, test_size = 0.25):
 
     dupl_entry = [(row,column,data[row,column]) for column in item_idx for row
                   in user_idx if not math.isnan(data[row,column]) ]
-    train_subset_0 , test_set = train_test_split(dupl_entry, test_size=
-                                               test_size)
+    train_subset_0 , test_set = train_test_split(dupl_entry, test_size=test_size)
     train_subset_1 = [(row, column,data[row,column]) for column in item_unique
-                      for row in user_unique]
-    train_set = train_subset_0+ train_subset_1
+                      for row in user_unique if not math.isnan(data[row,column])]
+    train_set = train_subset_0 + train_subset_1
 
     return train_set, test_set
 
@@ -78,13 +78,10 @@ def data_loading(dataFrame_dir = None):
 
     train_data, test_data = data_split(table_data, test_size=0.25)
 
-    train_data = pd.DataFrame(train_data)
-    test_data = pd.DataFrame(test_data)
-
-    train_set =  Dataset(train_data.to_numpy())
+    train_set =  Dataset(np.array(train_data))
     train_loader = DataLoader(train_set, **params)
 
-    test_set =  Dataset(test_data.to_numpy())
+    test_set =  Dataset(np.array(test_data))
     test_loader =DataLoader(test_set, **params)
 
     return table_pivot, train_loader, test_loader 
