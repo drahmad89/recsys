@@ -17,10 +17,8 @@ class NMF(nn.Module):
         , requires_grad = True)
         return
 
-    def forward(self, user_idx, item_idx):
-        return  torch.einsum('bs,bs->b',self.user_w[user_idx,:]
-                             ,self.item_w[item_idx,:]).type(torch.DoubleTensor).cuda()
-
+    def forward(self, user_idx, item_idx ):
+        return  torch.einsum('bs,bs->b',self.user_w[user_idx,:] ,self.item_w[item_idx,:]).type(torch.DoubleTensor).cuda() 
 
 def train(table,train_loader, loss_fct = 'mse_loss'):
     latent_dim = 10
@@ -39,7 +37,7 @@ def train(table,train_loader, loss_fct = 'mse_loss'):
         for idx in train_loader:
 
             pred = NMF_model(idx[:,0].type(torch.LongTensor),
-                             idx[:,1].type(torch.LongTensor))
+                                              idx[:,1].type(torch.LongTensor))
             loss = getattr(F,loss_fct)(pred, idx[:,2])
             #loss = 0.5*(pred - idx[:,2].type(torch.DoubleTensor).cuda())**2
             loss.backward()
@@ -61,7 +59,7 @@ def train(table,train_loader, loss_fct = 'mse_loss'):
                         pred = NMF_model(idx[:,0].type(torch.LongTensor),
                                          idx[:,1].type(torch.LongTensor))
                         loss = getattr(F,loss_fct)(pred, idx[:,2])
-                        total_loss += loss.item()
+                        total_loss += loss.item() 
                         count += 1
                         valid_loss = total_loss / count
                         if valid_loss < best_loss:
@@ -71,7 +69,7 @@ def train(table,train_loader, loss_fct = 'mse_loss'):
                             best_loss = valid_loss
                         else:
                             print("Valid loss:", valid_loss)
- 
+
 
     return
 
