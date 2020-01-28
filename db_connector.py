@@ -5,8 +5,9 @@ import numpy as np
 import pdb
 
 def test_class():
-    database_connector = Database_connector('localhost', 'root', 'fadwa123', 'rs_101')
-    database_connector.query("SELECT AuthenticationID, MOBI_MCC_ID, MerchantID, F_score, M_score, L_score, P_score FROM UserSnapshots WHERE SnapshotTag = '20180901-20190401' AND UserID IS NULL")
+    database_connector = Database_connector('localhost', 'root', 'fadwa123',
+                                            'recsys_1')
+    database_connector.query("SELECT CardholderID , MOBI_MCC_ID, F_score, M_score, L_score, P_score FROM carholdermccscorings WHERE SnapshotTag = '20170401-20190401'")
     database_connector.pivot("AuthenticationID", "MOBI_MCC_ID", "M_score")
     database_connector.save_df(dataframe='pivot_df') 
 
@@ -37,7 +38,7 @@ class Database_connector:
         return df
 
     def hashmap_pk(self, item):
-        self.df = self._hashmap(self.df, 'AuthenticationID', 'UserKey')
+        self.df = self._hashmap(self.df,'CardholderID', 'UserKey')
         self.df = self._hashmap(self.df, 'MOBI_MCC_ID', 'ItemKey')
         self.df.sort_values(by=['UserKey', 'ItemKey'], inplace= True)
 

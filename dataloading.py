@@ -60,14 +60,11 @@ def data_split(data, test_size = 0.25):
 
 
 def data_loading(dataFrame_dir = None):
-    params = {'batch_size':64,
+    params = {'batch_size':250,
                 'shuffle':True,
                 }
-
-    query = "SELECT AuthenticationID, MOBI_MCC_ID, MerchantID, F_score,\
-                             M_score, L_score, P_score FROM UserSnapshots WHERE SnapshotTag = \
-                             '20180901-20190401' AND UserID IS NULL"
-    database_connector = Database_connector('localhost', 'ahmad', '', 'rs_101')
+    query = "SELECT CardholderID , MOBI_MCC_ID, F_score, M_score, L_score, P_score FROM carholdermccscorings WHERE SnapshotTag = '20170401-20190401'"
+    database_connector = Database_connector('localhost', 'ahmad', '', 'recsys_1')
     database_connector.query(query = None)
     #_  = database_connector.hashmap_pk( 'MOBI_MCC_ID')
     table_subset = database_connector.columns_subset("UserKey", "ItemKey", "M_score")
