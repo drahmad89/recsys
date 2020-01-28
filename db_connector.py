@@ -8,7 +8,7 @@ def test_class():
     database_connector = Database_connector('localhost', 'root', 'fadwa123',
                                             'recsys_1')
     database_connector.query("SELECT CardholderID , MOBI_MCC_ID, F_score, M_score, L_score, P_score FROM carholdermccscorings WHERE SnapshotTag = '20170401-20190401'")
-    database_connector.pivot("AuthenticationID", "MOBI_MCC_ID", "M_score")
+    database_connector.pivot("CardholderID", "MOBI_MCC_ID", "M_score")
     database_connector.save_df(dataframe='pivot_df') 
 
 
@@ -16,7 +16,8 @@ class Database_connector:
 
     def __init__(self, host, user, password, database):
         self.mariadb_connection = mariadb.connect(host='localhost', user= user,
-                                                  password=password, database='rs_101')
+                                                  password=password,
+                                                  database='recsys_1')
         self.df = None
 
     def query(self, query=None):
