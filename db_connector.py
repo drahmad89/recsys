@@ -9,7 +9,7 @@ def test_class():
                                             'recsys_1')
     database_connector.query("SELECT CardholderID , MOBI_MCC_ID, F_score, M_score, L_score, P_score FROM carholdermccscorings WHERE SnapshotTag = '20170401-20190401'")
     database_connector.pivot("CardholderID", "MOBI_MCC_ID", "M_score")
-    database_connector.save_df(dataframe='pivot_df') 
+    database_connector.save_df(dataframe='pivot3.pkl')
 
 
 class Database_connector:
@@ -38,7 +38,7 @@ class Database_connector:
         df[column_key] = df[column].map(d)
         return df
 
-    def hashmap_pk(self, item, query = None):
+    def hashmap_pk(self, query = None):
         if query:
             self.df = self._hashmap(self.df,'CardholderID', 'UserKey')
             self.df = self._hashmap(self.df, 'MOBI_MCC_ID', 'ItemKey')
