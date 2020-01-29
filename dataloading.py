@@ -66,7 +66,7 @@ def data_loading(dataFrame_dir = None):
     query = "SELECT CardholderID , MOBI_MCC_ID, F_score, M_score, L_score, P_score FROM carholdermccscorings WHERE SnapshotTag = '20170401-20190401'"
     database_connector = Database_connector('localhost', 'ahmad', '', 'recsys_1')
     database_connector.query(query = None)
-    #_  = database_connector.hashmap_pk( 'MOBI_MCC_ID')
+    database_connector.hashmap_pk( 'MOBI_MCC_ID')
     table_subset = database_connector.columns_subset("UserKey", "ItemKey", "M_score")
 
     table_pivot = database_connector.pivot('UserKey', 'ItemKey', 'M_score')

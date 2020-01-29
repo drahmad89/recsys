@@ -24,7 +24,7 @@ class Database_connector:
         if query:
             self.df =  pd.read_sql(query, con=self.mariadb_connection)
             return self.df
-        self.df = pd.read_pickle('./df_2.pkl')
+        self.df = pd.read_pickle('./df_3.pkl')
 
         return self.df
 
@@ -38,10 +38,11 @@ class Database_connector:
         df[column_key] = df[column].map(d)
         return df
 
-    def hashmap_pk(self, item):
-        self.df = self._hashmap(self.df,'CardholderID', 'UserKey')
-        self.df = self._hashmap(self.df, 'MOBI_MCC_ID', 'ItemKey')
-        self.df.sort_values(by=['UserKey', 'ItemKey'], inplace= True)
+    def hashmap_pk(self, item, query = None):
+        if query:
+            self.df = self._hashmap(self.df,'CardholderID', 'UserKey')
+            self.df = self._hashmap(self.df, 'MOBI_MCC_ID', 'ItemKey')
+            self.df.sort_values(by=['UserKey', 'ItemKey'], inplace= True)
 
         return self.df
 
