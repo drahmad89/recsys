@@ -1,0 +1,8 @@
+ 
+
+
+try loading the pickle file with new pandas
+convert in to numpy 
+save into npy
+
+then load npy and create dataframe with costume column and use old pandas
