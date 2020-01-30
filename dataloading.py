@@ -5,7 +5,6 @@ import torch
 import sklearn
 from torch.utils import data
 from torch.utils.data import DataLoader
-from db_connector import Database_connector
 from sklearn.model_selection import train_test_split
 class Dataset(data.Dataset):
 
@@ -20,29 +19,12 @@ class Dataset(data.Dataset):
 
 
 def data_split(data, test_size = 0.25):
-    #triplets=[]
-    #user_track={}
-    #item_track={}
-    #for row in range(data.shape[0]):
-    #    row_counter = 0
-    #    for column in range(data.shape[1]):
-    #        if not data[row, column]:
-    #            continue
-
-    #        if column in item_track.keys:
-    #            item_track[column]+=1
-
-    #        else:
-    #            item_track[column]=1
-
-    #        row_counter += 1
-    #        triplets.append((row, column, data[row, column]))
-    #    user_track[row] = row_counter
     binTable = np.isfinite(data)
     user_count = np.sum(binTable, axis = 1)
     item_count = np.sum(binTable, axis = 0)
     item_idx = np.where(item_count > 1)[0]
     user_idx = np.where(user_count > 1)[0]
+    assert user_idx, "Are you using a unique table??"
 
     user_unique = [x for x in range(data.shape[0]) if x not in  user_idx]
     item_unique = [x for x in range(data.shape[1]) if x not in  item_idx]
@@ -58,9 +40,9 @@ def data_split(data, test_size = 0.25):
 
 
 
-def data_loading(dataFrame_dir = "/home/ahmad/recsys_data/pivot3.pkl"):
+def data_loading(dataFrame_dir = "/home/ahmad/recsys_data/mid_pivot.hdf"):
 
-    table_pivot = pd.read_hdf('./mid_pivot.hdf', mode='r')
+    table_pivot = pd.read_hdf(dataFrame_dir, mode='r')
     table_data = table_pivot.values
 
     train_data, test_data = data_split(table_data, test_size=0.25)
