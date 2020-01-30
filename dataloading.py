@@ -58,21 +58,7 @@ def data_split(data, test_size = 0.25):
 
 
 
-
 def data_loading(dataFrame_dir = "/home/ahmad/recsys_data/pivot3.pkl"):
-    """
-    params = {'batch_size':250,
-                'shuffle':True,
-                }
-    query = "SELECT CardholderID , MOBI_MCC_ID, F_score, M_score, L_score, P_score FROM carholdermccscorings WHERE SnapshotTag = '20170401-20190401'"
-    database_connector = Database_connector('localhost', 'ahmad', '', 'recsys_1')
-    df = database_connector.query(query = None,
-                                  direc=dataFrame_dir)
-    database_connector.hashmap_pk( 'MOBI_MCC_ID')
-    table_subset = database_connector.columns_subset("UserKey", "ItemKey", "M_score")
-
-    table_pivot = database_connector.pivot('UserKey', 'ItemKey', 'M_score')
-    """
 
     table_pivot = pd.read_hdf('./mid_pivot.hdf', mode='r')
     table_data = table_pivot.values
