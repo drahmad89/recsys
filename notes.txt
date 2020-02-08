@@ -6,3 +6,18 @@ convert in to numpy
 save into npy
 
 then load npy and create dataframe with costume column and use old pandas
+
+
+For table  CustomerScorings:
+cardholderID and MOBI_MCC_ID
+cardholder ID and Merchant Id (sparce but not unique by defintion)
+
+
+for table cardholdermccscoring:
+it should be values for cardholder id and mobimcc id althought there is chance of an error in this table o
+
+
+
+list(set(A)-set(B))
+Array(where(condition))
+xx,yy = np.where(~np.isnan(data[user_idx])) 

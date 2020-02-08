@@ -1,3 +1,8 @@
+
+" Training module"
+
+
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -8,41 +13,48 @@ from dataloading import data_loading, Dataset
 from torch.autograd import Variable
 from torch.utils.tensorboard import SummaryWriter
 from model import NMF
-
-
+import configs as cfg
 
 
 
 def train(table,
           train_loader,
           valid_loader,
-          loss_fct = 'mse_loss',
-          epoch_nb = 10,
-          Lr=0.0001,
-          Weight_decay = 0.00001
+          loss_fct='mse_loss',
+          epoch_nb=3,
+          lr=0.0001,
+          Weight_decay=0.00001
             ):
-    model = NMF(table.shape[0], table.shape[1])
-    optimzer=optim.Adam(params=[model.user_w, model.item_w] , lr=Lr,
+    model = NMF(table.shape[0], table.shape[1], loss=loss_fct).cuda().float()
+    optimzer=optim.Adam(params=[model.user_w, model.item_w] , lr=lr,
                         weight_decay=Weight_decay)
     best_loss = np.inf
     total_loss = 0
     i=0
     report_every = 20
 
-    writer = SummaryWriter("logs/MF/")
+    writer = SummaryWriter("logs/MF_long_features/")
+
 
     for epoch in range(epoch_nb):
         running_loss = 0.0
+        running_acc = 0.0
         time_step_count = 1
 
         for idx in train_loader:
 
-            pred = model(idx[:,0].type(torch.LongTensor),
-                                              idx[:,1].type(torch.LongTensor))
-            loss = getattr(F,loss_fct)(pred, idx[:,2])
+            pred = model(idx[:, 0].long().cuda(),
+                         idx[:,1].long().cuda())
+            if loss_fct =='cross_entropy':
+                loss = getattr(F,loss_fct)(pred, idx[:,2].long())
+            elif loss_fct == 'mse_loss':
+                loss = getattr(F,loss_fct)(pred, idx[:,2].unsqueeze(1).float())
             loss.backward()
             optimzer.step()
             total_samples = idx.numel()
+            max_vals, max_indices = torch.max(pred,1)
+            running_acc += (max_indices == \
+                            idx[:,2]).sum().data.cpu().numpy()/max_indices.size()[0]
             running_loss += loss.detach().item() * total_samples
             time_step_count += total_samples
 
@@ -53,36 +65,56 @@ def train(table,
                 writer.add_scalar('training_loss',
                                   running_loss/time_step_count,
                                   epoch * len(train_loader) + i)
-                print('[%d, %5d] loss: %.3f' %
-                      (epoch, i, running_loss / time_step_count))
+                writer.add_scalar('training_acc',
+                                  running_acc/time_step_count,
+                                  epoch * len(train_loader) + i)
+                print('[%d, %5d] loss: %.3f acc: %1.3f'%
+                      (epoch, i, running_loss / time_step_count,
+                       running_acc/(time_step_count/total_samples)))
                 running_loss = 0.0
+                running_acc = 0.0
                 time_step_count = 0
-            if i % report_every * 10 ==0:
-                print("REPORTING!!")
-                model.eval()
-                with torch.no_grad():
-                    total_loss = 0.
-                    count = 0
-                    for idx in valid_loader:
-                        pred = model(idx[:,0].type(torch.LongTensor),
-                                         idx[:,1].type(torch.LongTensor))
-                        loss = getattr(F,loss_fct)(pred, idx[:,2])
-                        total_loss += loss.item() 
-                        count += 1
-                    valid_loss = total_loss / count
-                    writer.add_scalar('valid_loss',
-                                     valid_loss,
-                                     epoch * len(valid_loader) +i)
-                    if valid_loss < best_loss:
-                        print("Best valid loss:", valid_loss)
-                        with open('nmd_model.pt', 'wb') as f:
-                            torch.save(model, f)
-                        best_loss = valid_loss
-                    else:
-                        print("Valid loss:", valid_loss)
-                model.train()
+            #if i % report_every * 10 == 0:
+            #    valid_running_acc = 0.
+            #    print("REPORTING!!")
+            #    model.eval()
+            #    with torch.no_grad():
+            #        valid_running_acc = 0
+            #        total_loss = 0.
+            #        count = 0
+            #        for val_idx in valid_loader:
+            #            pred = model(val_idx[:, 0].type(torch.LongTensor),
+            #                             val_idx[:, 1].type(torch.LongTensor))
+            #            if loss_fct =='cross_entropy':
+            #                loss = getattr(F,loss_fct)(pred, val_idx[:,2].long())
+            #            elif loss_fct == 'mse_loss':
+            #                loss = getattr(F,loss_fct)(pred, val_idx[:,2].unsqueeze(1).float())
+            #            total_loss += loss.item() 
+            #            max_vals, max_indices = torch.max(pred,1)
+            #            valid_running_acc += (max_indices == \
+            #                val_idx[:,2]).sum().data.cpu().numpy()/max_indices.size()[0]
 
-    return
+            #            count += 1
+            #            if count > cfg.VALID_LIMIT:
+            #                break
+
+            #        valid_loss = total_loss / count
+            #        valid_acc = valid_running_acc /count
+            #        writer.add_scalar('valid_loss',
+            #                         valid_loss,
+            #                         epoch * len(valid_loader) +i)
+            #        if valid_loss < best_loss:
+            #            print("Best valid loss:", valid_loss)
+            #            print("Best valid acc:", valid_acc)
+            #            with open('nmd_model.pt', 'wb') as f:
+            #                torch.save(model, f)
+            #            best_loss = valid_loss
+            #        else:
+            #            print("Valid loss:", valid_loss)
+            #            print("Valid acc:", valid_acc)
+            #    model.train()
+
+    return 1
 
 
 

@@ -11,9 +11,9 @@ def dataloading(user_column, item_column, feature, file_dir_name,  query = False
     database_connector = Database_connector('localhost', 'root', 'fadwa123',
                                             'recsys_1')
     if query:
-        database_connector.query(("SELECT {}, {}, {} 
-                                 FROM carholdermccscorings 
-                                 WHERE SnapshotTag =
+        database_connector.query(("SELECT {}, {}, {} \
+                                  FROM carholdermccscorings \
+                                 WHERE SnapshotTag = \
                                  '20170401-20190401'").format(user_column,
                                                              item_column,
                                                             feature))
@@ -53,7 +53,7 @@ class Database_connector:
         df[column_key] = df[column].map(d)
         return df
 
-    def hashmap_pk(self,user_column, item_column,  query = None):
+    def hashmap_pk(self,user_column,item_column,query = None):
         if query:
             self.df = self._hashmap(self.df,user_column, 'UserKey')
             self.df = self._hashmap(self.df, item_column, 'ItemKey')
@@ -81,4 +81,5 @@ class Database_connector:
             print("Loading data is done!")
 
 if __name__ == "__main__":
-    test_class('CardholderID', 'MOBI_MCC_ID', 'M_score')
+    file_directory_name= None
+    dataloading('CardholderID', 'MerchantID', 'M_score')
