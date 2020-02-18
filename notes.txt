@@ -21,3 +21,11 @@ it should be values for cardholder id and mobimcc id althought there is chance o
 list(set(A)-set(B))
 Array(where(condition))
 xx,yy = np.where(~np.isnan(data[user_idx])) 
+apply smooth labellling !!!!
+- create a baseline heuristique model to compare with
+                if loss_fct == 'cross_entropy':
+- formulate a way to keep cosine distance betweeen user embedding close ( make use of the baseline model discussion)
+-check bugs
+
+-Try to compute the average distance for each mcc to make comparision on the predictibility 
+- percentage of each score in the table for each mcc

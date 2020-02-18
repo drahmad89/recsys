@@ -61,7 +61,7 @@ def data_loading(dataFrame_dir = "/home/ahmad/recsys_data/mid_pivot.hdf"):
     params = {'batch_size':1500, 'shuffle':True,}
     table_pivot = pd.read_hdf(dataFrame_dir, mode='r')
     table_data = table_pivot.values.astype(np.float)
-    train_data, test_data = data_split(table_data, test_size=0.25)
+    train_data, test_data = data_split(table_data, test_size=0.2)
     train_set =  Dataset(np.array(train_data))
     train_loader = DataLoader(train_set, **params)
     test_set =  Dataset(np.array(test_data))
